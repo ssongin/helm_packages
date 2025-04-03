@@ -1,0 +1,9 @@
+apiVersion: v2
+name: pihole
+description: Pihole - DNS sinkhole
+type: application
+version: 0.1.0
+dependencies:
+  - name: pihole
+    repository: https://mojo2600.github.io/pihole-kubernetes
+    version: 2.28.0

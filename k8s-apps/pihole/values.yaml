@@ -1,0 +1,55 @@
+pihole:
+  ingress:
+    enabled: false
+
+  persistentVolumeClaim:
+    enabled: false
+
+  dnsmasq:
+    customDnsEntries:
+      - "address=/cloud.lan/192.168.10.100"
+      - "address=/pihole.cloud.lan/192.168.10.100"
+      - "address=/rancher.cloud.lan/192.168.10.100"
+      - "address=/grafana.cloud.lan/192.168.10.100"
+      - "address=/traefik-dashboard.cloud.lan/192.168.10.100"
+      - "address=/calibre.cloud.lan/192.168.10.100"
+      - "address=/plex.cloud.lan/192.168.10.100"
+    customSettings:
+      # permit all origins
+      - except-interface=nonexisting
+
+  serviceWeb:
+    type: ClusterIP
+
+  serviceDns:
+    loadBalancerIP: 192.168.10.101
+    externalTrafficPolicy: Cluster
+    annotations:
+      metallb.universe.tf/allow-shared-ip: pihole-svc
+    type: LoadBalancer
+
+  podDnsConfig:
+    enabled: true
+    policy: "None"
+    nameservers:
+      - "127.0.0.1"
+      - "1.1.1.1"
+      - "1.0.0.1"
+  adminPassword: "password"
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  extraEnvVars:
+    DNSMASQ_USER: "root"
+
+  env:
+    TZ: "{{ common.timezone }}"
+    FTLCONF_LOCAL_IPV4: 192.168.10.101
+    DNSMASQ_LISTENING: "all"
+    FTLCONF_RATE_LIMIT: "0/0"
