@@ -88,7 +88,7 @@ kube-prometheus-stack:
       scrapeTimeout: 5s
 
     ingress:
-      enabled: true
+      enabled: false
       ingressClassName: nginx
 
       annotations:
@@ -224,7 +224,7 @@ kube-prometheus-stack:
   # ==============================================================================
 
   alertmanager:
-    enabled: true
+    enabled: false
     alertmanagerSpec:
       # useExistingSecret: true
       secrets:
@@ -277,7 +277,7 @@ kube-prometheus-stack:
             receiver: empty
 
     ingress:
-      enabled: true
+      enabled: false
       ingressClassName: nginx
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt
