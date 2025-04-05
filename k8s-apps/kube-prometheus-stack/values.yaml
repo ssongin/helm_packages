@@ -27,11 +27,11 @@ kube-prometheus-stack:
 
       resources:
         requests:
+          cpu: 500m
+          memory: 500Mi
+        limits:
           cpu: 1000m
           memory: 1Gi
-        limits:
-          cpu: 2000m
-          memory: 2Gi
 
       # ref: https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/user-guides/storage.md
       storageSpec:
@@ -76,7 +76,7 @@ kube-prometheus-stack:
   # ==============================================================================
 
   grafana:
-    defaultDashboardsTimezone: Europe/Paris
+    defaultDashboardsTimezone: Europe/Vilnius
 
     # Required as long as Grafana's persistent volume is ReadWriteOnce.
     # During a rolling update, the new Grafana pod would not be able to start
@@ -112,20 +112,20 @@ kube-prometheus-stack:
 
     # The oAuth2 proxy handles authentication, not Grafana.
     grafana.ini:
-      auth:
-        disable_login_form: true
-        signout_redirect_url: "https://grafana.terence.cloud/oauth2/sign_out"
-      auth.basic:
-        enabled: false
-      auth.proxy:
-        enabled: true
-        header_name: X-Auth-Request-Email
-        header_property: email
-        auto_sign_up: true
-      users:
-        allow_sign_up: false
-        auto_assign_org: true
-        auto_assign_org_role: Admin
+      # auth:
+      #   disable_login_form: true
+      #   signout_redirect_url: "https://grafana.terence.cloud/oauth2/sign_out"
+      # auth.basic:
+      #   enabled: false
+      # auth.proxy:
+      #   enabled: true
+      #   header_name: X-Auth-Request-Email
+      #   header_property: email
+      #   auto_sign_up: true
+      # users:
+      #   allow_sign_up: false
+      #   auto_assign_org: true
+      #   auto_assign_org_role: Admin
 
     resources:
       requests:
@@ -138,16 +138,18 @@ kube-prometheus-stack:
     # Organise dashboards by provider, with the provider's name as the key.
     dashboards:
       default: # The "default" provider is defined below.
-        nginx-ingress-controller:
-          url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.48.1/deploy/grafana/dashboards/nginx.json
-        ingress-request-performance:
-          url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.48.1/deploy/grafana/dashboards/request-handling-performance.json
+        traefik-ingress-controller:
+          url: https://github.com/traefik/traefik/blob/master/contrib/grafana/traefik-kubernetes.json
+        # nginx-ingress-controller:
+        #   url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.48.1/deploy/grafana/dashboards/nginx.json
+        # ingress-request-performance:
+        #   url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.48.1/deploy/grafana/dashboards/request-handling-performance.json
         cloudnativepg:
           gnetId: 20417
           datasource: Prometheus
-        longhorn:
-          gnetId: 16888
-          datasource: Prometheus
+        # longhorn:
+        #   gnetId: 16888
+        #   datasource: Prometheus
       extra:
         {}
         # pihole-overview:
