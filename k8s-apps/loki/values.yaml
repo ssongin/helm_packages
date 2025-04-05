@@ -28,7 +28,14 @@ loki:
     querier:
       # Default is 4, if you have enough memory and CPU you can increase, reduce if OOMing
       max_concurrent: 2
+  resultsCache:
+    # -- Specifies whether memcached based results-cache should be enabled
+    enabled: false
+  memcachedExporter:
+    # -- Whether memcached metrics should be exported
+    enabled: false
   chunksCache:
+    enabled: false
     writebackSizeLimit: 100MB
   gateway:
     service:
