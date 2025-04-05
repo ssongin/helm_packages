@@ -76,6 +76,7 @@ kube-prometheus-stack:
   # ==============================================================================
 
   grafana:
+    replicas: 1
     defaultDashboardsTimezone: Europe/Vilnius
 
     # Required as long as Grafana's persistent volume is ReadWriteOnce.
@@ -130,10 +131,10 @@ kube-prometheus-stack:
     resources:
       requests:
         cpu: 50m
-        memory: 256Mi
+        memory: 100Mi
       limits:
-        cpu: 1000m
-        memory: 512Mi
+        cpu: 200m
+        memory: 300Mi
 
     # Organise dashboards by provider, with the provider's name as the key.
     dashboards:
