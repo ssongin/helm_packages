@@ -38,7 +38,7 @@ pihole:
   admin:
     enabled: true
     existingSecret: pihole-admin-password
-    passwordKey: key
+    passwordKey: admin-password
 
   resources:
     limits:
