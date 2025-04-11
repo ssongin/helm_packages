@@ -42,11 +42,11 @@ pihole:
 
   resources:
     limits:
-      cpu: 200m
-      memory: 256Mi
+      cpu: 150m
+      memory: 200Mi
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 75m
+      memory: 100Mi
 
   extraEnvVars:
     DNSMASQ_USER: "root"
