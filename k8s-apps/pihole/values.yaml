@@ -35,7 +35,10 @@ pihole:
       - "127.0.0.1"
       - "1.1.1.1"
       - "1.0.0.1"
-  adminPassword: "password"
+  admin:
+    enabled: true
+    existingSecret: pihole-admin-password
+    passwordKey: key
 
   resources:
     limits:
@@ -49,7 +52,7 @@ pihole:
     DNSMASQ_USER: "root"
 
   env:
-    TZ: "{{ common.timezone }}"
+    TZ: Europe/Vilnius
     FTLCONF_LOCAL_IPV4: 192.168.10.101
     DNSMASQ_LISTENING: "all"
     FTLCONF_RATE_LIMIT: "0/0"
