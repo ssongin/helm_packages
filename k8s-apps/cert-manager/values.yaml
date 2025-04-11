@@ -12,15 +12,15 @@ cert-manager:
   webhook:
     resources:
       requests:
-        cpu: 10m
+        cpu: 20m
         memory: 32Mi
       limits:
-        cpu: 20m
-        memory: 48Mi
+        cpu: 45m
+        memory: 60Mi
   resources:
     requests:
-      cpu: 10m
+      cpu: 15m
       memory: 32Mi
     limits:
-      cpu: 20m
-      memory: 48Mi
+      cpu: 30m
+      memory: 50Mi
