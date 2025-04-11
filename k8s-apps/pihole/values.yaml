@@ -12,7 +12,6 @@ pihole:
     tls:
       - secretName: pihole-tls-secret
         hosts:
-          - virtualHost
           - pihole.homelab.net
   #  - secretName: chart-example-tls
   #    hosts:

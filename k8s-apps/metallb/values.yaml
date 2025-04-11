@@ -1,0 +1,15 @@
+metallb:
+  prometheus:
+    serviceAccount: kube-prometheus-stack-prometheus
+    namespace: monitoring
+    podMonitor:
+      enabled: true
+    prometheusRule:
+      enabled: true
+  frr:
+    enabled: false
+addressPools:
+  - name: default
+    autoassign: true
+    addresses:
+      - 192.168.10.100-192.168.10.200
