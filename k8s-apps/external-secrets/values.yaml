@@ -72,11 +72,11 @@ external-secrets:
 
   resources:
     requests:
-      cpu: 5m
+      cpu: 10m
       memory: 20Mi
     limits:
       cpu: 20m
-      memory: 35Mi
+      memory: 40Mi
 
   prometheus:
     # -- Specifies whether to expose Service resource for collecting Prometheus metrics
@@ -162,16 +162,16 @@ external-secrets:
   webhook:
     resources:
       requests:
-        cpu: 5m
-        memory: 20Mi
-      limits:
         cpu: 10m
-        memory: 40Mi
+        memory: 25Mi
+      limits:
+        cpu: 20m
+        memory: 50Mi
   certController:
     resources:
       requests:
-        cpu: 5m
-        memory: 20Mi
-      limits:
         cpu: 10m
-        memory: 40Mi
+        memory: 25Mi
+      limits:
+        cpu: 20m
+        memory: 50Mi
