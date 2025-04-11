@@ -51,6 +51,13 @@ loki:
       enabled: true
   singleBinary:
     replicas: 1
+    resoures:
+      limits:
+        cpu: 10m
+        memory: 50Mi
+      requests:
+        cpu: 20m
+        memory: 100Mi
     affinity:
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution: []
