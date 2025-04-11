@@ -1,6 +1,23 @@
 pihole:
   ingress:
-    enabled: false
+    enabled: true
+    hosts:
+      - pihole.homelab.net
+    path: /
+    annotations:
+      kubernetes.io/ingress.class: traefik
+      cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+      external-dns.alpha.kubernetes.io/hostname: pihole.homelab.net
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    tls:
+      - secretName: pihole-tls-secret
+        hosts:
+          - virtualHost
+          - pihole.homelab.net
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #     #- virtualHost (default value is pi.hole) will be appended to the hosts
+  #      - chart-example.local
 
   persistentVolumeClaim:
     enabled: false
@@ -13,6 +30,7 @@ pihole:
       - "address=/grafana.cloud.lan/192.168.10.100"
       - "address=/traefik-dashboard.cloud.lan/192.168.10.100"
       - "address=/calibre.cloud.lan/192.168.10.100"
+      - "address=/pihole.homelab.net/10.101.0.211"
       - "address=/plex.cloud.lan/192.168.10.100"
     customSettings:
       # permit all origins
