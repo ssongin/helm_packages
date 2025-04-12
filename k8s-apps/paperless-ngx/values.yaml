@@ -1,0 +1,237 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/common-3.4.0/charts/library/common/values.schema.json
+app-template:
+  configMaps:
+    config:
+      data:
+        PAPERLESS_TIME_ZONE: Europe/Vilnius
+        PAPERLESS_PORT: "{{ .Values.service.main.ports.http.port }}"
+        PAPERLESS_URL: "https://{{ (first .Values.ingress.main.hosts).host }}"
+        PAPERLESS_DBENGINE: postgresql
+        PAPERLESS_ENABLE_HTTP_REMOTE_USER: "true"
+        PAPERLESS_OCR_LANGUAGE: eng
+        PAPERLESS_TASK_WORKERS: "2"
+        PAPERLESS_THREADS_PER_WORKER: "2"
+        PAPERLESS_REDIS: redis://{{ .Release.Name }}-redis-master
+        PAPERLESS_LOGOUT_REDIRECT_URL: "https://{{ (first .Values.ingress.main.hosts).host }}/oauth2/sign_out"
+        # Paperless keeps the original file
+        PAPERLESS_OCR_USER_ARGS: '{"invalidate_digital_signatures": true}'
+  controllers:
+    main:
+      type: deployment
+      annotations:
+        reloader.stakater.com/auto: "true"
+      containers:
+        main:
+          image:
+            repository: ghcr.io/paperless-ngx/paperless-ngx
+            tag: 2.15.1@sha256:a06d051e0c422e83498a36676d504d94de262686f167cccc826a71170ddef00a
+          ports:
+            - name: http
+              containerPort: 8000
+          envFrom:
+            - configMapRef:
+                identifier: config
+          env:
+            PAPERLESS_DBHOST:
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-cnpg-cluster-pg17-app"
+                  key: host
+            PAPERLESS_DBNAME:
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-cnpg-cluster-pg17-app"
+                  key: dbname
+            PAPERLESS_DBUSER:
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-cnpg-cluster-pg17-app"
+                  key: user
+            PAPERLESS_DBPASS:
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-cnpg-cluster-pg17-app"
+                  key: password
+          probes:
+            liveness:
+              enabled: true
+              custom: true
+              spec:
+                httpGet:
+                  port: http
+                  path: /
+            readiness:
+              enabled: true
+              custom: true
+              spec:
+                httpGet:
+                  port: http
+                  path: /
+        backup:
+          image:
+            repository: ghcr.io/paperless-ngx/paperless-ngx
+            tag: 2.15.1@sha256:a06d051e0c422e83498a36676d504d94de262686f167cccc826a71170ddef00a
+          envFrom:
+            - configMapRef:
+                identifier: config
+          command:
+            - /bin/sh
+            - -c
+            - |
+              while true; do
+                echo "Starting backup"
+                python3 /usr/src/paperless/src/manage.py document_exporter /usr/src/paperless/export -d -f -p -sm -z
+                sleep 86400
+              done
+          env:
+            PAPERLESS_DBHOST:
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-cnpg-cluster-pg17-app"
+                  key: host
+            PAPERLESS_DBNAME:
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-cnpg-cluster-pg17-app"
+                  key: dbname
+            PAPERLESS_DBUSER:
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-cnpg-cluster-pg17-app"
+                  key: user
+            PAPERLESS_DBPASS:
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-cnpg-cluster-pg17-app"
+                  key: password
+
+  service:
+    main:
+      controller: main
+      ports:
+        http:
+          port: 8000
+
+  ingress:
+    main:
+      enabled: true
+      className: "nginx"
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
+        external-dns.alpha.kubernetes.io/target: home.terence.cloud
+        nginx.ingress.kubernetes.io/proxy-body-size: 100m
+        # nginx.ingress.kubernetes.io/auth-url: "https://$host/oauth2/auth"
+        # nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$escaped_request_uri"
+        # nginx.ingress.kubernetes.io/configuration-snippet: |
+        #   auth_request_set $auth_header $upstream_http_x_auth_request_user;
+        #   proxy_set_header 'remote-user' $auth_header;
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: "Paperless"
+        gethomepage.dev/description: "A document management system."
+        gethomepage.dev/group: "Media"
+        gethomepage.dev/icon: "paperless-ngx"
+        nginx.ingress.kubernetes.io/whitelist-source-range: "0.0.0.0/0"
+      hosts:
+        - host: paperless.terence.cloud
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+              service:
+                identifier: main
+                port: http
+      tls:
+        - secretName: paperless-tls
+          hosts:
+            - paperless.terence.cloud
+
+  persistence:
+    data:
+      enabled: true
+      retain: true
+      globalMounts:
+        - path: /usr/src/paperless/data
+      accessMode: ReadWriteOnce
+      size: 1Gi
+    media:
+      enabled: true
+      retain: true
+      globalMounts:
+        - path: /usr/src/paperless/media
+      accessMode: ReadWriteOnce
+      size: 8Gi
+    export:
+      enabled: true
+      retain: true
+      globalMounts:
+        - path: /usr/src/paperless/export
+      accessMode: ReadWriteOnce
+      size: 1Gi
+    consume:
+      enabled: true
+      retain: true
+      globalMounts:
+        - path: /usr/src/paperless/consume
+      accessMode: ReadWriteOnce
+      size: 4Gi
+
+redis:
+  enabled: true
+  auth:
+    enabled: false
+    usePasswordFiles: false
+    username: ""
+  master:
+    persistence:
+      enabled: true
+      labels:
+        velero.io/exclude-from-backup: "true"
+  replica:
+    replicaCount: 0
+    pdb:
+      create: false
+
+cnpg-cluster-pg17:
+  type: postgresql
+  mode: recovery
+  version:
+    postgresql: "17"
+  cluster:
+    instances: 1
+    imageCatalogRef:
+      kind: ClusterImageCatalog
+      name: postgresql
+    storage:
+      size: 10Gi
+    resources: {}
+    primaryUpdateMethod: switchover
+    primaryUpdateStrategy: unsupervised
+    logLevel: "info"
+    monitoring:
+      enabled: true
+      podMonitor:
+        enabled: true
+    postgresql: {}
+    initdb:
+      database: paperless-ngx
+  recovery:
+    method: import
+    import:
+      type: microservice
+      databases: ["paperless-ngx"]
+      schemaOnly: true
+      source:
+        host: paperless-ngx-cnpg-cluster-rw
+        username: paperless-ngx
+        database: paperless-ngx
+        passwordSecret:
+          name: paperless-ngx-cnpg-cluster-app
+          key: password
+        sslKeySecret:
+          name: paperless-ngx-cnpg-cluster-replication
+          key: tls.key
+        sslCertSecret:
+          name: paperless-ngx-cnpg-cluster-replication
+          key: tls.crt
+        sslRootCertSecret:
+          name: paperless-ngx-cnpg-cluster-ca
+          key: ca.crt

@@ -1,0 +1,16 @@
+apiVersion: v2
+name: paperless-ngx
+description: Scan, index and archive all your physical documents
+type: application
+version: 0.1.0
+dependencies:
+  - name: app-template
+    repository: https://bjw-s.github.io/helm-charts
+    version: 3.7.3
+  - name: redis
+    repository: https://charts.bitnami.com/bitnami
+    version: 20.11.5
+  - name: cluster-local
+    alias: cnpg-cluster-pg17
+    repository: "file://../../charts/cnpg-cluster"
+    version: 0.2.1
