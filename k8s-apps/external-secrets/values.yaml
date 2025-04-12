@@ -72,11 +72,11 @@ external-secrets:
 
   resources:
     requests:
-      cpu: 15m
-      memory: 20Mi
+      cpu: 20m
+      memory: 30Mi
     limits:
-      cpu: 30m
-      memory: 40Mi
+      cpu: 60m
+      memory: 80Mi
 
   prometheus:
     # -- Specifies whether to expose Service resource for collecting Prometheus metrics
@@ -173,5 +173,5 @@ external-secrets:
         cpu: 20m
         memory: 30Mi
       limits:
-        cpu: 40m
-        memory: 60Mi
+        cpu: 50m
+        memory: 80Mi

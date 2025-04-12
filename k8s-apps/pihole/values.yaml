@@ -1,6 +1,7 @@
 pihole:
   ingress:
     enabled: true
+    ingressClassName: traefik
     hosts:
       - pihole.homelab.net
     path: /
@@ -37,6 +38,9 @@ pihole:
 
   serviceWeb:
     type: ClusterIP
+
+  serviceDhcp:
+    enabled: false
 
   serviceDns:
     loadBalancerIP: 192.168.10.101
