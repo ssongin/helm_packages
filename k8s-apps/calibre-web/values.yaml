@@ -1,177 +1,59 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/common-3.4.0/charts/library/common/values.schema.json
 app-template:
-  # defaultPodOptions:
-  #   automountServiceAccountToken: false
-  #   securityContext:
-  #     runAsUser: 568
-  #     runAsGroup: 568
-  #     fsGroup: 568
-  #     fsGroupChangePolicy: "OnRootMismatch"
-
+  defaultPodOptions:
+    securityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: OnRootMismatch
+      supplementalGroups:
+        - 65539
   controllers:
-    # Configure the main controller
-    main:
-      type: deployment
-      annotations:
-        reloader.stakater.com/auto: "true"
+    calibre-web:
+      type: statefulset
+      strategy: RollingUpdate
       containers:
-        main:
+        app:
           image:
-            repository: crocodilestick/calibre-web-automated
-            tag: v2.0.1@sha256:252be12743b4dae4c731a1c01ae2004a848cb8315c88998a97be69de7fd0e416
+            repository: ghcr.io/bjw-s-labs/calibre-web
+            tag: 0.6.24@sha256:bd76e12e6ea54e50f56961aee202e1087dd45ad42de12440501dccae2ab90690
           env:
-            TZ: Europe/Vilnius
-            DOCKER_MODS: "lscr.io/linuxserver/mods:universal-calibre-v7.16.0"
-            LOG_LEVEL: DEBUG
-          ports:
-            - name: http
-              containerPort: 8083
-          probes:
-            liveness:
-              enabled: true
-              type: HTTP
-            readiness:
-              enabled: true
-              type: HTTP
-            startup:
-              enabled: true
-              type: HTTP
-              spec:
-                failureThreshold: 15
-    book-downloader:
-      type: deployment
-      annotations:
-        reloader.stakater.com/auto: "true"
-      pod:
-        affinity:
-          podAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              - labelSelector:
-                  matchExpressions:
-                    - key: app.kubernetes.io/name
-                      operator: In
-                      values:
-                        - calibre-web
-                topologyKey: kubernetes.io/hostname
-      containers:
-        main:
-          image:
-            repository: ghcr.io/calibrain/calibre-web-automated-book-downloader
-            tag: latest@sha256:12691808e34fc9e8269ffa414ff486f9efed8c445d3bd35789dab1e9f221776a
-          env:
-            TZ: Europe/Vilnius
-            FLASK_PORT: 8084
-            FLASK_DEBUG: false
-            CLOUDFLARE_PROXY_URL: http://localhost:8000
-            INGEST_DIR: /cwa-book-ingest
-            BOOK_LANGUAGE: fr
-            UID: "0"
-            GID: "0"
-          ports:
-            - name: http
-              containerPort: 8084
-          probes:
-            liveness:
-              enabled: true
-              custom: true
-              spec:
-                httpGet:
-                  port: http
-                  path: /request/api/status
-            readiness:
-              enabled: true
-              custom: true
-              spec:
-                httpGet:
-                  port: http
-                  path: /request/api/status
-        cloudflare-bypass:
-          image:
-            repository: ghcr.io/sarperavci/cloudflarebypassforscraping
-            tag: latest@sha256:b6aa9426a60e19db720486d549e0d8e9f38869a959c75c53f480ae830ba6dedb
-          env:
-            TZ: Europe/Vilnius
-          ports:
-            - name: http
-              containerPort: 8000
-          probes:
-            liveness:
-              enabled: true
-              custom: true
-              spec:
-                tcpSocket:
-                  port: http
-            readiness:
-              enabled: true
-              custom: true
-              spec:
-                tcpSocket:
-                  port: http
-
+            CACHE_DIR: /cache
+          resources:
+            requests:
+              cpu: 15m
+              memory: 249M
+            limits:
+              memory: 299M
   service:
     main:
-      controller: main
-      type: ClusterIP
+      controller: calibre-web
       ports:
         http:
           port: 8083
-    book-downloader:
-      controller: book-downloader
-      type: ClusterIP
-      ports:
-        http:
-          port: 8084
-
-  ingress:
-    # main:
-    #   annotations:
-    #     cert-manager.io/cluster-issuer: letsencrypt
-    #     external-dns.alpha.kubernetes.io/target: home.terence.cloud
-    #     # external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
-    #     nginx.ingress.kubernetes.io/proxy-body-size: 100m
-    #     gethomepage.dev/enabled: "true"
-    #     gethomepage.dev/name: "Calibre"
-    #     gethomepage.dev/description: "A book library manager."
-    #     gethomepage.dev/group: "Media"
-    #     gethomepage.dev/icon: "calibre"
-    #     # nginx.ingress.kubernetes.io/auth-url: "https://$host/oauth2/auth"
-    #     # nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$escaped_request_uri"
-    #     # nginx.ingress.kubernetes.io/auth-response-headers: X-Auth-Request-User
-    #   className: "nginx"
-    #   hosts:
-    #     - host: &host calibre.terence.cloud
-    #       paths:
-    #         - path: /
-    #           pathType: Prefix
-    #           service:
-    #             identifier: main
-    #             port: http
-    #   tls:
-    #     - secretName: calibre-tls
-    #       hosts:
-    #         - *host
-    # book-downloader:
-    #   annotations:
-    #     cert-manager.io/cluster-issuer: letsencrypt
-    #     external-dns.alpha.kubernetes.io/target: home.terence.cloud
-    #     nginx.ingress.kubernetes.io/auth-url: "https://$host/oauth2/auth"
-    #     nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$escaped_request_uri"
-    #     nginx.ingress.kubernetes.io/auth-response-headers: X-Auth-Request-User
-    #   className: "nginx"
-    #   hosts:
-    #     - host: &host calibredl.terence.cloud
-    #       paths:
-    #         - path: /
-    #           pathType: Prefix
-    #           service:
-    #             identifier: book-downloader
-    #             port: http
-    #   tls:
-    #     - secretName: calibredl-tls
-    #       hosts:
-    #         - *host
-
+  # ingress:
+  #   main:
+  #     enabled: true
+  #     className: external
+  #     annotations:
+  #       nginx.ingress.kubernetes.io/auth-response-headers:
+  #         Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+  #       nginx.ingress.kubernetes.io/auth-snippet:
+  #         proxy_set_header X-Forwarded-Host $http_host;
+  #       nginx.ingress.kubernetes.io/auth-url:
+  #         http://ak-outpost-proxy-outpost.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
+  #       nginx.ingress.kubernetes.io/auth-signin:
+  #         /outpost.goauthentik.io/start?rd=$escaped_request_uri
+  #     hosts:
+  #       - host: &host calibre-web.${EXTERNAL_DOMAIN}
+  #         paths:
+  #           - path: /
+  #             service:
+  #               identifier: main
+  #               port: http
+  #     tls:
+  #       - hosts: [*host]
   persistence:
-    # Configure the main configuration storage location
     config:
       enabled: true
       type: persistentVolumeClaim
@@ -179,17 +61,15 @@ app-template:
       size: 50Mi
       globalMounts:
         - path: /config
-    calibre-library:
+    media:
       enabled: true
-      size: 10Gi
-      accessMode: ReadWriteOnce
       type: persistentVolumeClaim
+      accessMode: ReadWriteOnce
+      size: 5Gi
       globalMounts:
-        - path: /calibre-library
-    cwa-book-ingest:
+        - path: /data/media
+    cache:
       enabled: true
-      size: 10Gi
-      accessMode: ReadWriteOnce
-      type: persistentVolumeClaim
+      type: emptyDir
       globalMounts:
-        - path: /cwa-book-ingest
+        - path: /cache
