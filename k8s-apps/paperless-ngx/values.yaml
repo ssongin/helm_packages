@@ -192,7 +192,8 @@ redis:
 
 cnpg-cluster-pg17:
   type: postgresql
-  mode: recovery
+  mode: standalone
+  # mode: recovery
   version:
     postgresql: "17"
   cluster:
@@ -213,25 +214,25 @@ cnpg-cluster-pg17:
     postgresql: {}
     initdb:
       database: paperless-ngx
-  recovery:
-    method: import
-    import:
-      type: microservice
-      databases: ["paperless-ngx"]
-      schemaOnly: true
-      source:
-        host: paperless-ngx-cnpg-cluster-pg17-rw
-        username: paperless-ngx
-        database: paperless-ngx
-        passwordSecret:
-          name: paperless-ngx-cnpg-cluster-pg17-app
-          key: password
-        sslKeySecret:
-          name: paperless-ngx-cnpg-cluster-pg17-replication
-          key: tls.key
-        sslCertSecret:
-          name: paperless-ngx-cnpg-cluster-pg17-replication
-          key: tls.crt
-        sslRootCertSecret:
-          name: paperless-ngx-cnpg-cluster-pg17-ca
-          key: ca.crt
+  # recovery:
+  #   method: import
+  #   import:
+  #     type: microservice
+  #     databases: ["paperless-ngx"]
+  #     schemaOnly: true
+  #     source:
+  #       host: paperless-ngx-cnpg-cluster-pg17-rw
+  #       username: paperless-ngx
+  #       database: paperless-ngx
+  #       passwordSecret:
+  #         name: paperless-ngx-cnpg-cluster-pg17-app
+  #         key: password
+  #       sslKeySecret:
+  #         name: paperless-ngx-cnpg-cluster-pg17-replication
+  #         key: tls.key
+  #       sslCertSecret:
+  #         name: paperless-ngx-cnpg-cluster-pg17-replication
+  #         key: tls.crt
+  #       sslRootCertSecret:
+  #         name: paperless-ngx-cnpg-cluster-pg17-ca
+  #         key: ca.crt
