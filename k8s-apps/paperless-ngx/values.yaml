@@ -220,18 +220,18 @@ cnpg-cluster-pg17:
       databases: ["paperless-ngx"]
       schemaOnly: true
       source:
-        host: paperless-ngx-cnpg-cluster-rw
+        host: paperless-ngx-cnpg-cluster-pg17-rw
         username: paperless-ngx
         database: paperless-ngx
         passwordSecret:
-          name: paperless-ngx-cnpg-cluster-app
+          name: paperless-ngx-cnpg-cluster-pg17-app
           key: password
         sslKeySecret:
-          name: paperless-ngx-cnpg-cluster-replication
+          name: paperless-ngx-cnpg-cluster-pg17-replication
           key: tls.key
         sslCertSecret:
-          name: paperless-ngx-cnpg-cluster-replication
+          name: paperless-ngx-cnpg-cluster-pg17-replication
           key: tls.crt
         sslRootCertSecret:
-          name: paperless-ngx-cnpg-cluster-ca
+          name: paperless-ngx-cnpg-cluster-pg17-ca
           key: ca.crt
