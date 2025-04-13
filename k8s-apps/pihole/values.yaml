@@ -14,7 +14,7 @@ pihole:
       gethomepage.dev/name: "Pihole"
       gethomepage.dev/description: "DNS sinkhole"
       gethomepage.dev/group: "Network"
-      gethomepage.dev/icon: "pihole"
+      gethomepage.dev/icon: https://raw.githubusercontent.com/pi-hole/graphics/master/Vortex/Vortex_favicon.png
     tls:
       - secretName: pihole-tls-secret
         hosts:

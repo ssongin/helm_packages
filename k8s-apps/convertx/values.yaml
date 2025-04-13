@@ -55,7 +55,7 @@ app-template:
         gethomepage.dev/name: convertx
         gethomepage.dev/description: Self-hosted online file converter
         gethomepage.dev/group: Tooling
-        gethomepage.dev/icon: https://raw.githubusercontent.com/C4illin/ConvertX/main/src/public/favicon-32x32.png
+        gethomepage.dev/icon: https://raw.githubusercontent.com/C4illin/ConvertX/main/public/favicon-32x32.png
       className: "traefik"
       hosts:
         - host: *host
