@@ -115,24 +115,19 @@ app-template:
   ingress:
     main:
       enabled: true
-      className: "nginx"
+      className: "traefik"
       annotations:
-        cert-manager.io/cluster-issuer: letsencrypt
-        external-dns.alpha.kubernetes.io/target: home.terence.cloud
-        nginx.ingress.kubernetes.io/proxy-body-size: 100m
-        # nginx.ingress.kubernetes.io/auth-url: "https://$host/oauth2/auth"
-        # nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$escaped_request_uri"
-        # nginx.ingress.kubernetes.io/configuration-snippet: |
-        #   auth_request_set $auth_header $upstream_http_x_auth_request_user;
-        #   proxy_set_header 'remote-user' $auth_header;
+        cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+        external-dns.alpha.kubernetes.io/hostname: &host paperless.homelab.net
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        ingressClassName: "traefik"
         gethomepage.dev/enabled: "true"
         gethomepage.dev/name: "Paperless"
         gethomepage.dev/description: "A document management system."
         gethomepage.dev/group: "Media"
         gethomepage.dev/icon: "paperless-ngx"
-        nginx.ingress.kubernetes.io/whitelist-source-range: "0.0.0.0/0"
       hosts:
-        - host: paperless.terence.cloud
+        - host: *host
           paths:
             - path: /
               pathType: ImplementationSpecific
@@ -140,9 +135,9 @@ app-template:
                 identifier: main
                 port: http
       tls:
-        - secretName: paperless-tls
+        - secretName: paperless-tls-secret
           hosts:
-            - paperless.terence.cloud
+            - *host
 
   persistence:
     data:

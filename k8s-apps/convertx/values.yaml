@@ -44,33 +44,32 @@ app-template:
 
   ingress:
     # Configure an Ingress for the main application
-    # main:
-    #   annotations:
-    #     cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
-    #     external-dns.alpha.kubernetes.io/target: home.terence.cloud
-    #     nginx.ingress.kubernetes.io/proxy-body-size: 100m
-    #     nginx.ingress.kubernetes.io/whitelist-source-range: "0.0.0.0/0"
-    #     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    #     external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
-    #     gethomepage.dev/enabled: "true"
-    #     gethomepage.dev/name: convertx
-    #     gethomepage.dev/description: Self-hosted online file converter
-    #     gethomepage.dev/group: Tooling
-    #     gethomepage.dev/icon: https://raw.githubusercontent.com/C4illin/ConvertX/main/src/public/favicon-32x32.png
-    #   className: "nginx"
-    #   hosts:
-    #     - host: &host convert.terence.cloud
-    #       paths:
-    #         - path: /
-    #           pathType: Prefix
-    #           service:
-    #             identifier: main
-    #             port: http
-    #   tls:
-    #     - secretName: convert-tls
-    #       hosts:
-    #         - *host
-    #
+    main:
+      annotations:
+        cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+        external-dns.alpha.kubernetes.io/hostname: &host paperless.homelab.net
+        external-dns.alpha.kubernetes.io/target: home.homelab.net
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: convertx
+        gethomepage.dev/description: Self-hosted online file converter
+        gethomepage.dev/group: Tooling
+        gethomepage.dev/icon: https://raw.githubusercontent.com/C4illin/ConvertX/main/src/public/favicon-32x32.png
+      className: "traefik"
+      hosts:
+        - host: *host
+          paths:
+            - path: /
+              pathType: Prefix
+              service:
+                identifier: main
+                port: http
+      tls:
+        - secretName: convert-tls-secret
+          hosts:
+            - *host
+
   persistence:
     config:
       enabled: true

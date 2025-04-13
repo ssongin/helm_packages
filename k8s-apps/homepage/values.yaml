@@ -43,17 +43,18 @@ homepage:
         gethomepage.dev/description: "A modern, secure, highly customizable application dashboard."
         gethomepage.dev/group: "A New Group"
         gethomepage.dev/icon: "homepage"
-        external-dns.alpha.kubernetes.io/target: home.terence.cloud
-        cert-manager.io/cluster-issuer: letsencrypt
-        nginx.ingress.kubernetes.io/whitelist-source-range: "0.0.0.0/0"
-      ingressClassName: "nginx"
+        kubernetes.io/ingress.class: traefik
+        cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+        external-dns.alpha.kubernetes.io/hostname: apps.homelab.net
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        ingressClassName: "traefik"
       hosts:
-        - host: &host "apps.terence.cloud"
+        - host: &host "apps.homelab.net"
           paths:
             - path: /
               pathType: Prefix
       tls:
-        - secretName: homepage-tls
+        - secretName: homepage-tls-secret
           hosts:
             - *host
 
