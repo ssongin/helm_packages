@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/common-3.4.0/charts/library/common/values.schema.json
+app-template:
+  defaultPodOptions:
+    automountServiceAccountToken: false
+
+  controllers:
+    # Configure the main controller
+    main:
+      type: deployment
+      annotations:
+        reloader.stakater.com/auto: "true"
+
+      containers:
+        # Configure the main application container
+        main:
+          image:
+            repository: corentinth/it-tools
+            tag: 2024.5.13-a0bc346@sha256:c191615f23eb6a18b8faca4dba15fc11caefea250ce3a8e29d249757544092eb
+          env:
+            TZ: Europe/Vilnius
+          ports:
+            - name: http
+              containerPort: 80
+          probes:
+            liveness:
+              enabled: true
+              custom: true
+              spec:
+                httpGet:
+                  port: 80
+                  path: /
+            readiness:
+              enabled: true
+              custom: true
+              spec:
+                httpGet:
+                  port: 80
+                  path: /
+  service:
+    # Configure a service for the main application
+    main:
+      controller: main
+      type: ClusterIP
+      ports:
+        http:
+          port: 8080
+          targetPort: 80
+
+  ingress:
+    main:
+      enabled: true
+      className: "traefik"
+      annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: it-tools
+        gethomepage.dev/description: Collection of handy online tools for developers
+        gethomepage.dev/group: Tooling
+        gethomepage.dev/icon: it-tools
+        kubernetes.io/ingress.class: traefik
+        cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+        external-dns.alpha.kubernetes.io/hostname: tools.homelab.net
+        external-dns.alpha.kubernetes.io/target: &host home.homelab.net
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        ingressClassName: "traefik"
+      hosts:
+        - host: *host
+          paths:
+            - path: /
+              pathType: Prefix
+              service:
+                identifier: main
+                port: http
+      tls:
+        - secretName: tools-tls-secret
+          hosts:
+            - *host
