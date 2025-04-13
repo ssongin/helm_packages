@@ -47,22 +47,29 @@ kube-prometheus-stack:
         # objectStorageConfig:
         #   key: objstore.yml
         #   name: thanos-objstore-secret
-
     ingress:
-      enabled: false
-      ingressClassName: nginx
+      enabled: true
+      ingressClassName: traefik
 
       annotations:
-        cert-manager.io/cluster-issuer: letsencrypt
-        external-dns.alpha.kubernetes.io/target: home.terence.cloud
-        nginx.ingress.kubernetes.io/auth-url: https://$host/oauth2/auth
-        nginx.ingress.kubernetes.io/auth-signin: https://$host/oauth2/start?rd=$escaped_request_uri
+        cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+        external-dns.alpha.kubernetes.io/hostname: &host prometheus.homelab.net
+        external-dns.alpha.kubernetes.io/target: home.homelab.net
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: Prometheus
+        gethomepage.dev/description: Monitoring system and time series database
+        gethomepage.dev/group: Monitoring
+        gethomepage.dev/icon: https://raw.githubusercontent.com/prometheus/prometheus/refs/heads/main/documentation/images/prometheus-logo.svg
+        # nginx.ingress.kubernetes.io/auth-url: https://$host/oauth2/auth
+        # nginx.ingress.kubernetes.io/auth-signin: https://$host/oauth2/start?rd=$escaped_request_uri
       hosts:
-        - prometheus.terence.cloud
+        - *host
       tls:
         - secretName: prometheus-general-tls
           hosts:
-            - prometheus.terence.cloud
+            - *host
 
     thanosService:
       enabled: false
@@ -89,27 +96,31 @@ kube-prometheus-stack:
       scrapeTimeout: 10s
 
     ingress:
-      enabled: false
-      ingressClassName: nginx
+      enabled: true
+      ingressClassName: traefik
 
       annotations:
-        cert-manager.io/cluster-issuer: letsencrypt
+        cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+        external-dns.alpha.kubernetes.io/hostname: &host grafana.homelab.net
+        external-dns.alpha.kubernetes.io/target: home.homelab.net
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: Grafana
+        gethomepage.dev/description: "The open platform for beautiful analytics and monitoring."
+        gethomepage.dev/group: Monitoring
+        gethomepage.dev/icon: https://raw.githubusercontent.com/grafana/grafana/refs/heads/main/public/img/grafana_icon.svg
+
         cert-manager.io/issue-temporary-certificate: "true"
-        external-dns.alpha.kubernetes.io/target: home.terence.cloud
         nginx.ingress.kubernetes.io/auth-url: https://$host/oauth2/auth
         nginx.ingress.kubernetes.io/auth-signin: https://$host/oauth2/start?rd=$escaped_request_uri
         nginx.ingress.kubernetes.io/auth-response-headers: X-Auth-Request-Email
-        gethomepage.dev/enabled: "true"
-        gethomepage.dev/name: "Grafana"
-        gethomepage.dev/description: "The open platform for beautiful analytics and monitoring."
-        gethomepage.dev/group: "Tooling"
-        gethomepage.dev/icon: "grafana"
       hosts:
-        - grafana.terence.cloud
+        - *host
       tls:
         - secretName: grafana-general-tls
           hosts:
-            - grafana.terence.cloud
+            - *host
 
     # The oAuth2 proxy handles authentication, not Grafana.
     grafana.ini:
