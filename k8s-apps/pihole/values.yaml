@@ -10,6 +10,11 @@ pihole:
       cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
       external-dns.alpha.kubernetes.io/hostname: pihole.homelab.net
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/name: "Pihole"
+      gethomepage.dev/description: "DNS sinkhole"
+      gethomepage.dev/group: "Network"
+      gethomepage.dev/icon: "pihole"
     tls:
       - secretName: pihole-tls-secret
         hosts:
@@ -22,16 +27,13 @@ pihole:
   persistentVolumeClaim:
     enabled: false
 
+  deploymentAnnotations:
+    reloader.stakater.com/auto: "true"
+
   dnsmasq:
     customDnsEntries:
-      - "address=/cloud.lan/192.168.10.100"
       - "address=/pihole.cloud.lan/192.168.10.100"
-      - "address=/rancher.cloud.lan/192.168.10.100"
-      - "address=/grafana.cloud.lan/192.168.10.100"
-      - "address=/traefik-dashboard.cloud.lan/192.168.10.100"
       - "address=/calibre.cloud.lan/192.168.10.100"
-      - "address=/pihole.homelab.net/10.101.0.211"
-      - "address=/plex.cloud.lan/192.168.10.100"
     customSettings:
       # permit all origins
       - except-interface=nonexisting
