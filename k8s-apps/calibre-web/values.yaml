@@ -2,12 +2,12 @@
 app-template:
   defaultPodOptions:
     securityContext:
-      runAsUser: 568
-      runAsGroup: 568
-      fsGroup: 568
+      runAsUser: 65534
+      runAsGroup: 65534
+      fsGroup: 65534
       fsGroupChangePolicy: OnRootMismatch
       supplementalGroups:
-        - 65539
+        - 65534
   controllers:
     calibre-web:
       type: statefulset
@@ -56,16 +56,20 @@ app-template:
   persistence:
     config:
       enabled: true
-      type: persistentVolumeClaim
-      accessMode: ReadWriteOnce
-      size: 50Mi
+      type: nfs
+      # accessMode: ReadWriteOnce
+      # size: 50Mi
+      server: 192.168.10.41
+      path: /Seagate/calibre/config
       globalMounts:
         - path: /config
     media:
       enabled: true
-      type: persistentVolumeClaim
-      accessMode: ReadWriteOnce
-      size: 5Gi
+      type: nfs
+      # accessMode: ReadWriteOnce
+      # size: 5Gi
+      server: 192.168.10.41
+      path: /Seagate/calibre/media
       globalMounts:
         - path: /data/media
     cache:
