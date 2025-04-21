@@ -15,8 +15,8 @@ cert-manager:
         cpu: 20m
         memory: 32Mi
       limits:
-        cpu: 45m
-        memory: 60Mi
+        cpu: 30m
+        memory: 100Mi
   resources:
     requests:
       cpu: 20m

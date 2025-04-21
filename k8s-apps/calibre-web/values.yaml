@@ -53,12 +53,38 @@ app-template:
   #               port: http
   #     tls:
   #       - hosts: [*host]
+  ingress:
+    main:
+      enabled: true
+      className: "traefik"
+      annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: Calibre Web
+        gethomepage.dev/description: E-book manager
+        gethomepage.dev/group: Media
+        gethomepage.dev/icon: https://raw.githubusercontent.com/kovidgoyal/calibre/master/resources/images/lt.png
+        kubernetes.io/ingress.class: traefik
+        cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+        external-dns.alpha.kubernetes.io/hostname: &host calibre.homelab.net
+        external-dns.alpha.kubernetes.io/target: home.homelab.net
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        ingressClassName: "traefik"
+      hosts:
+        - host: *host
+          paths:
+            - path: /
+              pathType: Prefix
+              service:
+                identifier: main
+                port: http
+      tls:
+        - secretName: tools-tls-secret
+          hosts:
+            - *host
   persistence:
     config:
       enabled: true
       type: nfs
-      # accessMode: ReadWriteOnce
-      # size: 50Mi
       server: 192.168.10.41
       path: /Seagate/calibre/config
       globalMounts:
@@ -66,8 +92,6 @@ app-template:
     media:
       enabled: true
       type: nfs
-      # accessMode: ReadWriteOnce
-      # size: 5Gi
       server: 192.168.10.41
       path: /Seagate/calibre/media
       globalMounts:

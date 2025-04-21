@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/common-3.4.0/charts/library/common/values.schema.json
+app-template:
+  defaultPodOptions:
+    securityContext:
+      runAsUser: 65534
+      runAsGroup: 65534
+      fsGroup: 65534
+      fsGroupChangePolicy: OnRootMismatch
+      supplementalGroups:
+        - 65534
+  controllers:
+    jellyfin:
+      type: deployment
+      strategy: RollingUpdate
+      containers:
+        app:
+          image:
+            repository: docker.io/jellyfin/jellyfin
+            tag: 2025041517@sha256:1e5cb522cc617a5b53675495935de567fb2197c8ec67adc7c84a87a8f9d5398f
+          resources:
+            requests:
+              cpu: 50m
+              memory: 200M
+            limits:
+              memory: 500M
+          env:
+            TZ: "Europe/Vilnius"
+  service:
+    main:
+      controller: jellyfin
+      ports:
+        http:
+          port: 8096
+  ingress:
+    main:
+      enabled: true
+      className: "traefik"
+      annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: Jellyfin
+        gethomepage.dev/description: Media server
+        gethomepage.dev/group: Media
+        gethomepage.dev/icon: https://raw.githubusercontent.com/jellyfin/jellyfin-ux/refs/heads/master/branding/web/icon-transparent.png
+        kubernetes.io/ingress.class: traefik
+        cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+        external-dns.alpha.kubernetes.io/hostname: &host jellyfin.homelab.net
+        external-dns.alpha.kubernetes.io/target: home.homelab.net
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        ingressClassName: "traefik"
+      hosts:
+        - host: *host
+          paths:
+            - path: /
+              pathType: Prefix
+              service:
+                identifier: main
+                port: http
+      tls:
+        - secretName: tools-tls-secret
+          hosts:
+            - *host
+  persistence:
+    config:
+      enabled: true
+      type: nfs
+      server: 192.168.10.41
+      path: /Seagate/jellyfin/config
+      globalMounts:
+        - path: /config
+    media:
+      enabled: true
+      type: nfs
+      server: 192.168.10.41
+      path: /Seagate/jellyfin/media
+      globalMounts:
+        - path: /media
+    cache:
+      enabled: true
+      type: nfs
+      server: 192.168.10.41
+      path: /Seagate/jellyfin/cache
+      globalMounts:
+        - path: /cache
