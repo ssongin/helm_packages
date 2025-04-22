@@ -1,0 +1,69 @@
+oauth2-proxy:
+  proxyVarsAsSecrets: true
+  config:
+    configFile: |-
+      email_domains = ["*"]
+
+  alphaConfig:
+    enabled: true
+    configData:
+      providers:
+        - id: gitlab
+          name: Gitlab
+          clientId: a1a25ca70a53eca50de277a812ce7f2b247c41c91f878a6df51d41fcd7f0fc69
+          clientSecretFile: /mnt/gitlab/clientSecret
+          provider: gitlab
+          code_challenge_method: S256
+          scope: "openid email"
+          gitlabConfig:
+            group:
+              - terencec_homelab
+          oidcConfig:
+            issuerURL: https://gitlab.com
+            audienceClaims: ["aud"]
+      injectResponseHeaders:
+        - name: X-Auth-Request-Email
+          values:
+            - claim: email
+        - name: X-Auth-Request-User
+          values:
+            - claim: user
+
+  ingress:
+    enabled: true
+    annotations:
+      external-dns.alpha.kubernetes.io/target: home.homelab.net
+    className: traefik
+    path: /oauth2
+    pathType: Prefix
+    # Every host that needs oauth authentication
+    hosts:
+      - alertmanager.homelab.net
+      - argocd.homelab.net
+      - calibre.homelab.net
+      - calibredl.homelab.net
+      - grafana.homelab.net
+      - headscale.homelab.net
+      - httpbin.homelab.net
+      - komoplane.homelab.net
+      - longhorn.homelab.net
+      - ntfy.homelab.net
+      - prometheus.homelab.net
+      - tailout.homelab.net
+      - z2m.homelab.net
+
+  metrics:
+    enabled: true
+    servicemonitor:
+      enabled: true
+
+  extraVolumes:
+    - name: gitlab-client-secret
+      secret:
+        secretName: gitlab-oauth2-credentials
+        items:
+          - key: client-secret
+            path: clientSecret
+  extraVolumeMounts:
+    - name: gitlab-client-secret
+      mountPath: /mnt/gitlab
