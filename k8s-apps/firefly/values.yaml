@@ -1,0 +1,136 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/common-3.4.0/charts/library/common/values.schema.json
+app-template:
+  # defaultPodOptions:
+  #   securityContext:
+  #     runAsUser: 65534
+  #     runAsGroup: 65534
+  #     fsGroup: 65534
+  #     fsGroupChangePolicy: "OnRootMismatch"
+  controllers:
+    main:
+      type: deployment
+      annotations:
+        reloader.stakater.com/auto: "true"
+      containers:
+        main:
+          image:
+            repository: docker.io/fireflyiii/core
+            tag: version-6.2.12@sha256:2fe8f53cb43532c03ed9f26cb98f5cc6a8c63f07e70c897d868f278f591c3ee3
+          env:
+            APP_KEY: f3soVSRsZxldQBaCDOqUDPkwOnGRr8Xz
+            DB_CONNECTION: pgsql
+            DB_PORT:
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-cnpg-cluster-pg17-app"
+                  key: port
+            DB_HOST:
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-cnpg-cluster-pg17-app"
+                  key: host
+            DB_DATABASE:
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-cnpg-cluster-pg17-app"
+                  key: dbname
+            DB_USERNAME:
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-cnpg-cluster-pg17-app"
+                  key: user
+            DB_PASSWORD:
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-cnpg-cluster-pg17-app"
+                  key: password
+
+  service:
+    main:
+      controller: main
+      ports:
+        http:
+          port: 8080
+
+  ingress:
+    main:
+      enabled: true
+      className: "traefik"
+      annotations:
+        cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+        external-dns.alpha.kubernetes.io/hostname: &host firefly.homelab.net
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        ingressClassName: "traefik"
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: "Firefly"
+        gethomepage.dev/description: "Personal finance manager"
+        gethomepage.dev/group: "Household"
+        gethomepage.dev/icon: https://raw.githubusercontent.com/firefly-iii/firefly-iii/develop/.github/assets/img/logo-small.png
+      hosts:
+        - host: *host
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+              service:
+                identifier: main
+                port: http
+      tls:
+        - secretName: firefly-tls-secret
+          hosts:
+            - *host
+
+  persistence:
+    upload:
+      enabled: true
+      type: nfs
+      server: 192.168.10.41
+      path: /Seagate/firefly/upload
+      globalMounts:
+        - path: /var/www/html/storage/upload
+
+cnpg-cluster-pg17:
+  type: postgresql
+  mode: standalone
+  # mode: recovery
+  version:
+    postgresql: "17"
+  cluster:
+    instances: 1
+    imageCatalogRef:
+      kind: ClusterImageCatalog
+      name: postgresql
+    storage:
+      size: 10Gi
+    resources: {}
+    primaryUpdateMethod: switchover
+    primaryUpdateStrategy: unsupervised
+    logLevel: "info"
+    monitoring:
+      enabled: true
+      podMonitor:
+        enabled: true
+    postgresql: {}
+    initdb:
+      database: paperless-ngx
+  # recovery:
+  #   method: import
+  #   import:
+  #     type: microservice
+  #     databases: ["paperless-ngx"]
+  #     schemaOnly: true
+  #     source:
+  #       host: paperless-ngx-cnpg-cluster-pg17-rw
+  #       username: paperless-ngx
+  #       database: paperless-ngx
+  #       passwordSecret:
+  #         name: paperless-ngx-cnpg-cluster-pg17-app
+  #         key: password
+  #       sslKeySecret:
+  #         name: paperless-ngx-cnpg-cluster-pg17-replication
+  #         key: tls.key
+  #       sslCertSecret:
+  #         name: paperless-ngx-cnpg-cluster-pg17-replication
+  #         key: tls.crt
+  #       sslRootCertSecret:
+  #         name: paperless-ngx-cnpg-cluster-pg17-ca
+  #         key: ca.crt

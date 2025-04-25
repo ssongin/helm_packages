@@ -145,7 +145,7 @@ kube-prometheus-stack:
         memory: 150Mi
       limits:
         cpu: 250m
-        memory: 300Mi
+        memory: 400Mi
 
     # Organise dashboards by provider, with the provider's name as the key.
     dashboards:

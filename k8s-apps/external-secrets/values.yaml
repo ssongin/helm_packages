@@ -174,4 +174,4 @@ external-secrets:
         memory: 30Mi
       limits:
         cpu: 50m
-        memory: 80Mi
+        memory: 100Mi

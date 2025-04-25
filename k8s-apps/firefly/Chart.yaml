@@ -1,0 +1,13 @@
+apiVersion: v2
+name: Firefly III
+description: A free and open source personal finance manager
+type: application
+version: 0.1.0
+dependencies:
+  - name: app-template
+    repository: https://bjw-s.github.io/helm-charts
+    version: 3.7.3
+  - name: cluster-local
+    alias: cnpg-cluster-pg17
+    repository: "file://../../charts/cnpg-cluster"
+    version: 0.2.1
