@@ -1,0 +1,15 @@
+apiVersion: v2
+name: nfs-volume
+description: PVC and PV resources for network file system
+type: application
+version: 0.0.1
+sources:
+  - https://github.com/ssongin/helm_packages
+keywords:
+  - volume
+  - nfs
+  - storage
+home: https://github.com/ssongin/helm_packages
+maintainers:
+  - name: YetAnotherGitUser
+    email: ssongin@gmail.com

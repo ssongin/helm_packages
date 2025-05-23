@@ -1,0 +1,29 @@
+{{- range .Values.pv }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .name }}-pv
+spec:
+  capacity:
+    storage: {{ .storage | default "5Gi" }}
+  accessModes:
+    - {{ .accessMode }}
+  persistentVolumeReclaimPolicy: {{ .reclaimPolicy | default "Retain" }}
+  nfs:
+    path: {{ .path }}
+    server: {{ .server | default "127.0.0.1" }}
+    readOnly: {{ .readOnly | default false }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .name }}-pvc
+spec:
+  accessModes:
+    - {{ .accessMode }}
+  resources:
+    requests:
+      storage: {{ .storage | default "5Gi" }}
+  volumeName: {{ .name }}-pv
+{{- end }}

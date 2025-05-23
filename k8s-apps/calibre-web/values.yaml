@@ -84,16 +84,14 @@ app-template:
   persistence:
     config:
       enabled: true
-      type: nfs
-      server: 192.168.10.41
-      path: /Seagate/calibre/config
+      type: persistentVolumeClaim
+      existingClaim: calibre-config-pvc
       globalMounts:
         - path: /config
     media:
       enabled: true
-      type: nfs
-      server: 192.168.10.41
-      path: /Seagate/calibre/media
+      type: persistentVolumeClaim
+      existingClaim: calibre-media-pvc
       globalMounts:
         - path: /data/media
     cache:
@@ -101,3 +99,13 @@ app-template:
       type: emptyDir
       globalMounts:
         - path: /cache
+nfs:
+  pv:
+    - name: calibre-config
+      storage: 300Mi
+      path: /Seagate/calibre/config/
+      server: 192.168.10.41
+    - name: calibre-media
+      storage: 5Gi
+      path: /Seagate/calibre/media
+      server: 192.168.10.41

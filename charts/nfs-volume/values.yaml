@@ -1,0 +1,8 @@
+pv:
+  - name: pv-name
+    # storage: 5Gi
+    path: /nfs/
+    # server: 127.0.0.1
+    # readOnly: false
+    accessMode: ReadWriteMany
+    # reclaimPolicy: Retain
