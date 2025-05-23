@@ -78,7 +78,7 @@ app-template:
                 identifier: main
                 port: http
       tls:
-        - secretName: tools-tls-secret
+        - secretName: calibre-tls-secret
           hosts:
             - *host
   persistence:

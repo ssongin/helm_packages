@@ -71,10 +71,15 @@ app-template:
             - *host
 
   persistence:
-    config:
+    data:
       enabled: true
-      type: nfs
-      server: 192.168.10.41
-      path: /Seagate/convertx/data
+      type: persistentVolumeClaim
+      existingClaim: convertx-data-pvc
       globalMounts:
         - path: /app/data
+nfs:
+  pv:
+    - name: convertx-data
+      storage: 1Gi
+      path: /Seagate/convertx/data
+      server: 192.168.10.41
