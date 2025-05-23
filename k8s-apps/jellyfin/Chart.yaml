@@ -7,3 +7,7 @@ dependencies:
   - name: app-template
     repository: https://bjw-s-labs.github.io/helm-charts
     version: 3.7.3
+  - name: nfs-volume
+    alias: nfs
+    repository: "file://../../charts/nfs-volume"
+    version: 0.0.1

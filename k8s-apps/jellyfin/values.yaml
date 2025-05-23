@@ -62,22 +62,34 @@ app-template:
   persistence:
     config:
       enabled: true
-      type: nfs
-      server: 192.168.10.41
-      path: /Seagate/jellyfin/config
+      type: persistentVolumeClaim
+      existingClaim: jellyfin-config-pvc
       globalMounts:
         - path: /config
     media:
       enabled: true
-      type: nfs
-      server: 192.168.10.41
-      path: /Seagate/jellyfin/media
+      type: persistentVolumeClaim
+      existingClaim: jellyfin-media-pvc
       globalMounts:
         - path: /media
     cache:
       enabled: true
-      type: nfs
-      server: 192.168.10.41
-      path: /Seagate/jellyfin/cache
+      type: persistentVolumeClaim
+      existingClaim: jellyfin-cache-pvc
       globalMounts:
         - path: /cache
+
+nfs:
+  pv:
+    - name: jellyfin-config
+      storage: 300Mi
+      path: /Seagate/jellyfin/config
+      server: 192.168.10.41
+    - name: jellyfin-cache
+      storage: 1Gi
+      path: /Seagate/jellyfin/cache
+      server: 192.168.10.41
+    - name: jellyfin-media
+      storage: 100Gi
+      path: /Seagate/jellyfin/media
+      server: 192.168.10.41
