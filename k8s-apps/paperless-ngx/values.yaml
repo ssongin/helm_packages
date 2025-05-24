@@ -197,7 +197,11 @@ cnpg-cluster-pg17:
       kind: ClusterImageCatalog
       name: postgresql
     storage:
-      size: 10Gi
+      # size: 10Gi
+      pvcTemplate:
+        name: firefly-pg-pvc
+        accessMode: ReadWriteOnce
+        size: 5Gi
     resources: {}
     primaryUpdateMethod: switchover
     primaryUpdateStrategy: unsupervised
@@ -231,3 +235,25 @@ cnpg-cluster-pg17:
   #       sslRootCertSecret:
   #         name: paperless-ngx-cnpg-cluster-pg17-ca
   #         key: ca.crt
+nfs:
+  pv:
+    - name: paperless-data
+      storage: 1Gi
+      path: /Seagate/paperless/data
+      server: 192.168.10.41
+    - name: paperless-media
+      storage: 8Gi
+      path: /Seagate/paperless/media
+      server: 192.168.10.41
+    - name: paperless-export
+      storage: 1Gi
+      path: /Seagate/paperless/export
+      server: 192.168.10.41
+    - name: paperless-consume
+      storage: 4Gi
+      path: /Seagate/paperless/consume
+      server: 192.168.10.41
+    - name: paperless-pg
+      storage: 5Gi
+      path: /Seagate/paperless/pg
+      server: 192.168.10.41
