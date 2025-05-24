@@ -82,9 +82,8 @@ app-template:
   persistence:
     upload:
       enabled: true
-      type: nfs
-      server: 192.168.10.41
-      path: /Seagate/firefly/upload
+      type: persistentVolumeClaim
+      existingClaim: firefly-upload-pvc
       globalMounts:
         - path: /var/www/html/storage/upload
 
@@ -100,7 +99,11 @@ cnpg-cluster-pg17:
       kind: ClusterImageCatalog
       name: postgresql
     storage:
-      size: 10Gi
+      # size: 10Gi
+      pvcTemplate:
+        name: firefly-pg-pvc
+        accessMode: ReadWriteOnce
+        size: 5Gi
     resources: {}
     primaryUpdateMethod: switchover
     primaryUpdateStrategy: unsupervised
@@ -134,3 +137,13 @@ cnpg-cluster-pg17:
   #       sslRootCertSecret:
   #         name: paperless-ngx-cnpg-cluster-pg17-ca
   #         key: ca.crt
+nfs:
+  pv:
+    - name: firefly-upload
+      storage: 2Gi
+      path: /Seagate/firefly/upload
+      server: 192.168.10.41
+    - name: firefly-pg
+      storage: 5Gi
+      path: /Seagate/firefly/pg
+      server: 192.168.10.41

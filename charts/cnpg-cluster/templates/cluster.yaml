@@ -23,9 +23,23 @@ spec:
   postgresUID: {{ include "cluster.postgresUID" . }}
   postgresGID: {{ include "cluster.postgresGID" . }}
   storage:
+    {{- if not (empty .Values.cluster.storage.storageClass) }}
     size: {{ .Values.cluster.storage.size }}
+    {{- end }}
     {{- if not (empty .Values.cluster.storage.storageClass) }}
     storageClass: {{ .Values.cluster.storage.storageClass }}
+    {{- end }}
+    {{- if not (empty .Values.cluster.storage.pvcTemplate) }}
+    pvcTemplate:
+      metadata:
+        name: {{ .Values.cluster.storage.pvcTemplate.name }}
+      spec:
+        accessModes:
+          -  {{ .Values.cluster.storage.pvcTemplate.accessMode }}
+        storageClassName: "" # Important!
+        resources:
+          requests:
+            storage:  {{ .Values.cluster.storage.pvcTemplate.size }}
     {{- end }}
   {{- if .Values.cluster.walStorage.enabled }}
   walStorage:
