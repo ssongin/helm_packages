@@ -99,7 +99,7 @@ cnpg-cluster-pg17:
       kind: ClusterImageCatalog
       name: postgresql
     storage:
-      # size: 10Gi
+      size: 5Gi
       pvcTemplate:
         name: firefly-pg-pvc
         accessMode: ReadWriteOnce
