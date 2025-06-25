@@ -1,5 +1,12 @@
 loki:
   deploymentMode: SingleBinary
+  persistence:
+    enabled: true
+    storageClass: "" # explicitly empty since you're using static PV
+    accessModes:
+      - ReadWriteMany
+    size: 5Gi
+    existingClaim: loki-folder-pvc
   loki:
     auth_enabled: false
     compactor:
@@ -58,13 +65,6 @@ loki:
       requests:
         cpu: 20m
         memory: 100Mi
-    persistence:
-      enabled: true
-      storageClass: "" # explicitly empty since you're using static PV
-      accessModes:
-        - ReadWriteMany
-      size: 5Gi
-      existingClaim: loki-folder-pvc
     affinity:
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution: []
