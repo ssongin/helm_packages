@@ -7,3 +7,7 @@ dependencies:
   - name: loki
     repository: https://grafana.github.io/helm-charts
     version: 6.29.0
+  - name: nfs-volume
+    alias: nfs
+    repository: "file://../../charts/nfs-volume"
+    version: 0.0.1

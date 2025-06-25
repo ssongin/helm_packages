@@ -58,6 +58,13 @@ loki:
       requests:
         cpu: 20m
         memory: 100Mi
+    persistence:
+      enabled: true
+      storageClass: "" # explicitly empty since you're using static PV
+      accessModes:
+        - ReadWriteMany
+      size: 5Gi
+      existingClaim: loki-folder-pvc
     affinity:
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution: []
@@ -87,3 +94,10 @@ loki:
     replicas: 0
   bloomGateway:
     replicas: 0
+
+nfs:
+  pv:
+    - name: loki-folder
+      storage: 5Gi
+      path: /Seagate/loki
+      server: 192.168.10.41
