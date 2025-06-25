@@ -83,7 +83,7 @@ kube-prometheus-stack:
   # ==============================================================================
 
   grafana:
-    enabled: false
+    enabled: true
     replicas: 1
     defaultDashboardsTimezone: Europe/Vilnius
 
