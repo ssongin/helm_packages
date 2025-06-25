@@ -1,6 +1,10 @@
 metrics-server:
-  defaultArgs:
-    - --cert-dir=/tmp
-    - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
-    - --kubelet-use-node-status-port
+  hostNetwork: false
+  replicas: 1
+  args:
+    - --kubelet-preferred-address-types=InternalIP,Hostname
     - --kubelet-insecure-tls
+  rbac:
+    create: true
+  apiService:
+    create: true
