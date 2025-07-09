@@ -1,0 +1,15 @@
+---
+all:
+  children:
+    control:
+      children:
+        control1:
+          hosts:
+            localhost:
+      vars:
+        ansible_port: 22
+        ansible_user: ubuntu
+        ansible_python_interpreter: /usr/bin/python3
+        ansible_connection: local
+        external_secrets_token: "my_secret_gitlab_token_for_external_secrets"
+        kubeconfig_path: /home/user/.kube/config

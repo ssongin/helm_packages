@@ -8,8 +8,10 @@ metallb:
       enabled: true
   frr:
     enabled: false
-addressPools:
-  - name: default
-    autoassign: true
-    addresses:
-      - 192.168.10.100-192.168.10.200
+  crds:
+    enabled: true
+  addressPools:
+    - name: default
+      autoassign: true
+      addresses:
+        - 192.168.10.100-192.168.10.200

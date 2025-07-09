@@ -1,0 +1,30 @@
+- name: Remove charts directories from helm charts
+  ansible.builtin.file:
+    path: "{{ item }}/charts"
+    state: absent
+  loop: "{{ helm_apps | map(attribute='path') | list }}"
+
+- name: Remove Chart.lock files from helm charts
+  ansible.builtin.file:
+    path: "{{ item }}/Chart.lock"
+    state: absent
+  loop: "{{ helm_apps | map(attribute='path') | list }}"
+
+- name: Run 'helm dependency build' for helm charts
+  ansible.builtin.command: helm dependency build "{{ item.path }}"
+  args:
+    chdir: "{{ item.path }}"
+  loop: "{{ helm_apps }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Install or upgrade Helm charts
+  kubernetes.core.helm:
+    kubeconfig: "{{ kubeconfig_path }}"
+    name: "{{ item.name }}"
+    chart_ref: "{{ item.path }}"
+    namespace: "{{ item.namespace }}"
+    state: present
+    wait: true
+    update_repo_cache: false
+  loop: "{{ helm_apps }}"

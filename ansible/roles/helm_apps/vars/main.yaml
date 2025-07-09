@@ -1,0 +1,45 @@
+manifest:
+  - gitlab_token.yaml
+helm_apps:
+  - name: loki
+    namespace: loki
+    path: "{{ playbook_dir }}/../k8s-apps/loki"
+  - name: prometheus-stack
+    namespace: monitoring
+    path: "{{playbook_dir }}/../k8s-apps/kube-prometheus-stack"
+  - name: metallb
+    namespace: metallb
+    path: "{{ playbook_dir }}/../k8s-apps/metallb"
+  - name: external-secrets
+    namespace: external-secrets
+    path: "{{ playbook_dir }}/../k8s-apps/external-secrets"
+  - name: cert-manager
+    namespace: cert-manager
+    path: "{{ playbook_dir }}/../k8s-apps/cert-manager"
+  - name: pihole
+    namespace: pihole
+    path: "{{ playbook_dir }}/../k8s-apps/pihole"
+  - name: reloader
+    namespace: reloader
+    path: "{{ playbook_dir }}/../k8s-apps/reloader"
+  - name: oauth2-proxy
+    namespace: oauth2-proxy
+    path: "{{ playbook_dir }}/../k8s-apps/oauth2-proxy"
+  - name: cloudnative-pg
+    namespace: cloudnative-pg
+    path: "{{ playbook_dir }}/../k8s-apps/cloudnative-pg"
+  - name: homepage
+    namespace: homepage
+    path: "{{ playbook_dir }}/../k8s-apps/homepage"
+  - name: jellyfin
+    namespace: jellyfin
+    path: "{{ playbook_dir }}/../k8s-apps/jellyfin"
+  - name: calibre-web
+    namespace: calibre-web
+    path: "{{ playbook_dir }}/../k8s-apps/calibre-web"
+  - name: it-tools
+    namespace: it-tools
+    path: "{{ playbook_dir }}/../k8s-apps/it-tools"
+  - name: convertx
+    namespace: convertx
+    path: "{{ playbook_dir }}/../k8s-apps/convertx"

@@ -1,0 +1,25 @@
+- name: Install required packages
+  ansible.builtin.include_tasks: prereqs.yaml
+
+- name: Ensure namespace exists
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_path }}"
+    # kubeconfig: /etc/rancher/k3s/k3s.yaml
+    api_version: v1
+    kind: Namespace
+    name: "{{ item.namespace }}"
+    state: present
+  loop: "{{ helm_apps }}"
+  loop_control:
+    label: "{{ item.namespace }}"
+
+- name: Apply manifests
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_path }}"
+    # kubeconfig: /etc/rancher/k3s/k3s.yaml
+    state: present
+    definition: "{{ lookup('template', 'roles/helm_apps/files/manifest/' + item) | from_yaml }}"
+  loop: "{{ manifest }}"
+
+- name: Install helm helm apps
+  ansible.builtin.include_tasks: helm.yaml

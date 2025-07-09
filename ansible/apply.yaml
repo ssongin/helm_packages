@@ -1,0 +1,7 @@
+---
+- name: Apply kubernetes configuration files
+  hosts: control1
+  become: false
+
+  roles:
+    - role: helm_apps

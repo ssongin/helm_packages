@@ -6,6 +6,9 @@ apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
   name: {{ template "metallb.fullname" $global }}-{{ $pool.name }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "5"  # Runs after CRDs (weight=0)
 spec:
   addresses:
     {{- range $address := $pool.addresses }}
