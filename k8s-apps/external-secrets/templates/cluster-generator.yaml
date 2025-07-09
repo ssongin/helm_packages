@@ -1,0 +1,18 @@
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: ClusterGenerator
+metadata:
+  name: password
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "5" # Runs after CRDs (weight=0)
+spec:
+  kind: Password
+  generator:
+    passwordSpec:
+      length: 32
+      digits: 5
+      symbols: 5
+      symbolCharacters: "!@#$%^&*"
+      noUpper: false
+      allowRepeat: true
+

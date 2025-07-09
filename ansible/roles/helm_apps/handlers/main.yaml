@@ -1,0 +1,4 @@
+- name: Remove temporary CRD directory
+  ansible.builtin.file:
+    path: "{{ crds_tmp_dir.path }}"
+    state: absent

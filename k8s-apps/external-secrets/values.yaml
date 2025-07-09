@@ -93,71 +93,7 @@ external-secrets:
   # -- Pod priority class name.
   priorityClassName: ""
 
-  extraObjects:
-    - apiVersion: external-secrets.io/v1beta1
-      kind: ClusterSecretStore
-      metadata:
-        name: gitlab-secret-store
-        annotations:
-          argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-      spec:
-        provider:
-          gitlab:
-            auth:
-              SecretRef:
-                accessToken:
-                  name: gitlab-secret
-                  namespace: external-secrets
-                  key: token
-            projectID: "68897114"
-    - apiVersion: generators.external-secrets.io/v1alpha1
-      kind: ClusterGenerator
-      metadata:
-        name: password
-      spec:
-        kind: Password
-        generator:
-          passwordSpec:
-            length: 32
-            digits: 5
-            symbols: 5
-            symbolCharacters: "!@#$%^&*"
-            noUpper: false
-            allowRepeat: true
-    - apiVersion: v1
-      kind: ServiceAccount
-      metadata:
-        name: k8s-secret-store
-    - apiVersion: rbac.authorization.k8s.io/v1
-      kind: ClusterRole
-      metadata:
-        name: k8s-secret-store
-      rules:
-        - apiGroups: [""]
-          resources:
-            - secrets
-          verbs:
-            - get
-            - list
-            - watch
-        - apiGroups:
-            - authorization.k8s.io
-          resources:
-            - selfsubjectrulesreviews
-          verbs:
-            - create
-    - apiVersion: rbac.authorization.k8s.io/v1
-      kind: ClusterRoleBinding
-      metadata:
-        name: k8s-secret-store
-      subjects:
-        - kind: ServiceAccount
-          name: k8s-secret-store
-          namespace: external-secrets
-      roleRef:
-        kind: ClusterRole
-        name: k8s-secret-store
-        apiGroup: rbac.authorization.k8s.io
+  # extraObjects:
 
   webhook:
     resources:
@@ -165,7 +101,7 @@ external-secrets:
         cpu: 20m
         memory: 30Mi
       limits:
-        cpu: 40m
+        cpu: 60m
         memory: 60Mi
   certController:
     resources:

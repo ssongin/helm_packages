@@ -1,0 +1,19 @@
+- name: Install Python Kubernetes dependencies
+  become: true
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - python3-pip
+    - gcc           # Required for some pip installs
+    - python3-dev   # Sometimes needed for compiling wheels
+    - libffi-dev
+    - libssl-dev
+
+- name: Ensure 'kubernetes' Python module is installed
+  become: true
+  ansible.builtin.pip:
+    name:
+      - kubernetes
+      # - openshift
+    executable: pip3
